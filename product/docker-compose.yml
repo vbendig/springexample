@@ -1,0 +1,47 @@
+version: '3.3'
+services:
+  product-app:
+    depends_on:
+      product-db:
+        condition: service_healthy
+    container_name: product-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: product-app:latest
+    ports:
+      - '19999:19999'
+    networks:
+      - spring-cloud-network
+    healthcheck:
+      test: "curl --fail --silent localhost:19999/actuator/health | grep UP || exit 1"
+      timeout: 30s
+      retries: 10
+  product-db:
+    container_name: product-db
+    image: mysql:8.0.32
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'product_db'
+      MYSQL_USER: 'productAdmin'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./product-db:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+    networks:
+      - spring-cloud-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 30s
+      retries: 10
+volumes:
+  product-db:
+  docker-entrypoint-initdb.d:
+networks:
+  spring-cloud-network:
+    driver: bridge
