@@ -39,7 +39,10 @@ public class ProductService {
 
     @Transactional
     public Product saveProduct(Product product) {
-        if (!productExists2(product)) {
+        boolean doesProdExist = productExists(product);
+        doesProdExist &= productExists1(product);
+        doesProdExist &= productExists2(product);
+        if (!doesProdExist) {
             return productRepository.save(product);
         } else {
             throw new IllegalArgumentException("Product already exists");
@@ -51,7 +54,7 @@ public class ProductService {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(qProduct.name.eq(product.getName()))
                         .and(qProduct.description.eq(product.getDescription()));
-        return productRepository.count(builder.getValue()) > 0;
+        return productRepository.count(builder) > 0;
     }
 
     public boolean productExists1(Product product) {
@@ -60,7 +63,7 @@ public class ProductService {
         return factory
                 .selectFrom(qProduct)
                 .where(qProduct.name.eq(product.getName()), qProduct.description.eq(product.getDescription()))
-                .stream().count() > 0;
+                .stream().findAny().isPresent();
 
     }
 
@@ -72,9 +75,6 @@ public class ProductService {
         return productRepository.exists(predicate);
     }
 
-    public void productTest(Product product) {
-        QProduct qProduct = QProduct.product;
-    }
     public void deleteProduct(Product product) {
         productRepository.delete(product);
     }
