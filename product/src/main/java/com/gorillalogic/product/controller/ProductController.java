@@ -27,8 +27,8 @@ public class ProductController {
     }
 
     @PostMapping(path = "/add")
-    public void saveProduct(@RequestBody Product product) {
-
+    public ResponseEntity<Product> saveProduct(@RequestBody Product product) {
+        return ResponseEntity.ok(productService.saveProduct(product));
     }
     @GetMapping(path="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Product> getProduct(@PathVariable long id) {

@@ -11,6 +11,7 @@ services:
     image: product-app:latest
     ports:
       - '19999:19999'
+      - '5005:5005'
     networks:
       - spring-cloud-network
     healthcheck:
