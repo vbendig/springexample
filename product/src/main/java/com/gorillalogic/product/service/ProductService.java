@@ -1,17 +1,19 @@
 package com.gorillalogic.product.service;
 
+import com.gorillalogic.product.dto.ProductDto;
+import com.gorillalogic.product.mapper.ProductMapper;
 import com.gorillalogic.product.model.Product;
 import com.gorillalogic.product.model.QProduct;
 import com.gorillalogic.product.repository.ProductRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
 @Slf4j
@@ -21,29 +23,35 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
 
+    private final ProductMapper productMapper;
+
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
-    public List<Product> getAll() {
-        return (List<Product>) productRepository.findAll();
+    public List<ProductDto> getAll() {
+        List<Product> products = (List<Product>) productRepository.findAll();
+        return products.stream().map(productMapper::productToProductDto).toList();
     }
 
-    public Product getProductById(long productId) {
+    public ProductDto getProductById(long productId) {
         log.info("Getting req for productId " + productId);
-        return productRepository.findByProductId(productId);
+        Product product = productRepository.findByProductId(productId);
+        return productMapper.productToProductDto(product);
     }
 
     @Transactional
-    public Product saveProduct(Product product) {
+    public ProductDto saveProduct(Product product) {
         boolean doesProdExist = productExists(product);
         doesProdExist &= productExists1(product);
         doesProdExist &= productExists2(product);
         if (!doesProdExist) {
-            return productRepository.save(product);
+            product = productRepository.save(product);
+            return productMapper.productToProductDto(product);
         } else {
             throw new IllegalArgumentException("Product already exists");
         }
@@ -75,7 +83,10 @@ public class ProductService {
         return productRepository.exists(predicate);
     }
 
-    public void deleteProduct(Product product) {
-        productRepository.delete(product);
+    public void deleteProduct(long productId) {
+        Product product = productRepository.findByProductId(productId);
+        if (product != null) {
+            productRepository.delete(product);
+        }
     }
 }

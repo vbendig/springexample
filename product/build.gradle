@@ -20,13 +20,6 @@ plugins {
 }
 apply plugin: "io.spring.dependency-management"
 
-idea {
-	module {
-		sourceDirs += file('generated/')
-		generatedSourceDirs += file('generated/')
-	}
-}
-
 group = 'com.gorillalogic'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'

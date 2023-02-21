@@ -1,6 +1,6 @@
 package com.gorillalogic.product.controller;
 
-import com.gorillalogic.product.model.Product;
+import com.gorillalogic.product.dto.ProductDto;
 import com.gorillalogic.product.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,7 +31,7 @@ public class ProductControllerTest {
     @Test
     public void whenJsonConverterIsFound_thenReturnResponse() throws Exception {
         String url = "/api/v1/product/1";
-        Product product = Product.builder().productId(1).name("Test").description("test").build();
+        ProductDto product = ProductDto.builder().productId(1).name("Test").description("test").build();
 
         Mockito.when(productService.getProductById(anyLong())).thenReturn(product);
         MvcResult result = this.mockMvc.perform(get(url))
