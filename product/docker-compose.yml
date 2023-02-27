@@ -15,7 +15,6 @@ services:
     networks:
       - app
       - db
-      - config
     healthcheck:
       test: "wget -qO- http://localhost:8080/actuator/health/ | grep UP || exit 1"
       timeout: 30s
@@ -46,9 +45,6 @@ volumes:
   product-db:
   docker-entrypoint-initdb.d:
 networks:
-  config:
-    external: true
-    driver: bridge
   app:
     external: true
     driver: bridge

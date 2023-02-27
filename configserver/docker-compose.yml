@@ -9,7 +9,7 @@ services:
     ports:
       - '8888:8888'
     networks:
-      - config
+      - app
     healthcheck:
       test: "wget -qO- http://localhost:8080/actuator/health/ | grep UP || exit 1"
       timeout: 30s
@@ -19,6 +19,6 @@ services:
 volumes:
   configuration:
 networks:
-  config:
+  app:
     external: true
     driver: bridge
