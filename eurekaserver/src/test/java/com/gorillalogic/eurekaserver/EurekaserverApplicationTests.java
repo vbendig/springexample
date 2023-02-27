@@ -1,12 +1,12 @@
-package com.gorillalogic.configserver;
+package com.gorillalogic.eurekaserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("native")
-class ConfigServerApplicationTests {
+@ActiveProfiles(value = "test")
+class EurekaserverApplicationTests {
 
 	@Test
 	void contextLoads() {

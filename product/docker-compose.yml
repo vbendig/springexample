@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.5'
 services:
   product-app:
     depends_on:
@@ -13,9 +13,11 @@ services:
       - '19999:19999'
       - '5005:5005'
     networks:
-      - spring-cloud-network
+      - app
+      - db
+      - config
     healthcheck:
-      test: "curl --fail --silent localhost:19999/actuator/health | grep UP || exit 1"
+      test: "wget -qO- http://localhost:8080/actuator/health/ | grep UP || exit 1"
       timeout: 30s
       retries: 10
   product-db:
@@ -35,7 +37,7 @@ services:
       - ./product-db:/var/lib/mysql
       - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
     networks:
-      - spring-cloud-network
+      - db
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 30s
@@ -44,5 +46,12 @@ volumes:
   product-db:
   docker-entrypoint-initdb.d:
 networks:
-  spring-cloud-network:
+  config:
+    external: true
+    driver: bridge
+  app:
+    external: true
+    driver: bridge
+  db:
+    external: true
     driver: bridge
