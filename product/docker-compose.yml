@@ -4,6 +4,8 @@ services:
     depends_on:
       product-db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
     container_name: product-app
     build:
       context: .
@@ -41,6 +43,25 @@ services:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 30s
       retries: 10
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.11.9-management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      - app
+    environment:
+      - "RABBITMQ_DEFAULT_PASS=pass"
+      - "RABBITMQ_DEFAULT_USER=user"
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
 volumes:
   product-db:
   docker-entrypoint-initdb.d:
